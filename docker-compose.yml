@@ -1,0 +1,23 @@
+version: '3'
+services:
+  database:
+    image: postgres:12
+    volumes:
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./database/data.sql:/docker-entrypoint-initdb.d/2-data.sql
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgrespassword
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    #ports:
+    #  - '3001:3001'
+    restart: on-failure 
+    container_name: hello-genity-app
+    volumes:
+      - /app/node_modules # Inside the container, don't try to override this folder, just leave as is
+      - ./server:/app # Look at the server directory and copy everything into the app folder in the container
+volumes:
+  db_data:
